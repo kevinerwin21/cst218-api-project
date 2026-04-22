@@ -11,6 +11,10 @@ Input validation and error handling
 Secure password hashing (using bcrypt)
 Environment based config with dotenv
 Database integration using MongoDB
+Added New Feature: Search & Sort 
+Search allows users to find workouts by exerciseName or category
+Sort allows users to order workouts by creation date (newest or oldest)
+To test GET /workouts?search=cardio or GET /workouts?sort=newest
 
 ## Tech Stack
 Node.js - Server-side runtime
