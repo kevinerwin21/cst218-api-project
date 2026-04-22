@@ -6,12 +6,37 @@ async function getAllItems(req, res) {
   try {
     console.log("Fetching workouts for user:", req.user.userId);
 
-    const items = await Workout.find({ userId: req.user.userId });
+    // Get query params
+    const { search, sort } = req.query;
+    // Validate Search
+    const isValidSearch = typeof search === "string" && search.trim().length > 0;
+    // Validate sort
+    const allowedSortValues = ["newest", "oldest"];
+    const sortValue = allowedSortValues.includes(sort) ? sort : "newest";
+    // Build query (user specific)
+    let query = { userId: req.user.userId };
+
+    if (isValidSearch) {
+      query.$or = [
+        { exerciseName: { $regex: search, $options: "i" } },
+        { category: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    // Sorting logic
+    let sortOption = { createdAt: -1 };
+
+    if (sortValue === "oldest") {
+      sortOption = { createdAt: 1 };
+    }
+    // DB query
+    const items = await Workout.find(query).sort(sortOption);
 
     return res.status(200).json({
       message: "Items retrieved",
       data: items,
     });
+
   } catch (err) {
     console.error("WORKOUT GET ALL ERROR:", err);
     return res.status(500).json({ error: err.message });
